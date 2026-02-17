@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits } from "discord.js";
+import { Client, Events, GatewayIntentBits } from "discord.js";
 
 import { commandModules } from "@/commands/index.js";
 import { loadEnv } from "@/config/env.js";
@@ -83,8 +83,8 @@ export async function createApplication() {
     logger
   });
 
-  client.once("ready", () => {
-    logger.info({ user: client.user?.tag }, "Discord client ready.");
+  client.once(Events.ClientReady, (readyClient) => {
+    logger.info({ user: readyClient.user.tag }, "Discord client ready.");
     scheduler.start();
   });
 

@@ -54,14 +54,17 @@ export class Scheduler {
 
       this.runningGuilds.add(guild.guildId);
       try {
-        await this.cwlBotService.ensureSeasonForCurrentMonth(guild.guildId).unwrapOr(
-          Promise.reject(new Error("Failed season rollover."))
-        );
+        const seasonResult = await this.cwlBotService.ensureSeasonForCurrentMonth(guild.guildId);
+        if (seasonResult.isErr()) {
+          throw seasonResult.error;
+        }
 
         if (due) {
-          await this.cwlBotService.runSyncNow(guild.guildId).unwrapOr(
-            Promise.reject(new Error("Scheduled sync failed."))
-          );
+          const syncResult = await this.cwlBotService.runSyncNow(guild.guildId);
+          if (syncResult.isErr()) {
+            throw syncResult.error;
+          }
+
           this.lastSyncByGuild.set(guild.guildId, now);
         }
       } catch (error) {
